@@ -50,3 +50,4 @@ bin/
 /.idea/.gitignore
 /.idea/dataSources.xml
 /.idea/git_toolbox_prj.xml
+/.idea/GitCommitMessageStorage.xml
