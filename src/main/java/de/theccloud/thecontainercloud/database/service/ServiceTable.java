@@ -20,10 +20,10 @@ public class ServiceTable {
     public ServiceTable(DatabaseInteractionHandler databaseInteractionHandler) {
         this.databaseInteractionHandler = databaseInteractionHandler;
 
-        this.databaseInteractionHandler.getSession().execute(SchemaBuilder.createTable("cloud", "services").ifNotExists()
+        this.databaseInteractionHandler.getSession().executeAsync(SchemaBuilder.createTable("cloud", "services").ifNotExists()
                 .addPartitionKey("uid", DataType.uuid())
-                .addColumn("task-uid", DataType.uuid())
-                .addColumn("player-count", DataType.cint())
+                .addColumn("task_id", DataType.uuid())
+                .addColumn("player_count", DataType.cint())
         );
 
     }
@@ -46,7 +46,7 @@ public class ServiceTable {
             return Optional.empty();
 
         Row one = this.databaseInteractionHandler.getSession()
-                .execute(QueryBuilder.select("uid", "task-id", "player-count").from("cloud", "services")
+                .execute(QueryBuilder.select("uid", "task_id", "player_count").from("cloud", "services")
                         .where(QueryBuilder.eq("uid", uid))).one();
 
 
@@ -56,8 +56,8 @@ public class ServiceTable {
     private ServiceImpl fromRow(Row row) {
 
         UUID uid = row.getUUID("uid");
-        UUID taskId = row.getUUID("task-id");
-        int playerCount = row.getInt("player-count");
+        UUID taskId = row.getUUID("task_id");
+        int playerCount = row.getInt("player_count");
 
         return new ServiceImpl(uid, taskId, playerCount);
     }
@@ -82,7 +82,7 @@ public class ServiceTable {
 
         this.databaseInteractionHandler.getSession().executeAsync(QueryBuilder.insertInto("cloud", "services")
                 .values(
-                        List.of("uid", "task-id", "player-count"),
+                        List.of("uid", "task_id", "player_count"),
                         List.of(service.getUid(), service.getTask(), service.getPlayerCount())
                 ));
     }
