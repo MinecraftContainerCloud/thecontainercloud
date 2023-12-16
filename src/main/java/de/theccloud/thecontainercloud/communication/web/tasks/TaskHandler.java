@@ -5,12 +5,18 @@ import de.theccloud.thecontainercloud.database.tasks.TaskTable;
 import de.theccloud.thecontainercloud.impl.task.TaskImpl;
 import io.javalin.http.Context;
 import io.javalin.json.JavalinGson;
+import io.javalin.websocket.WsConfig;
+import org.eclipse.jetty.websocket.api.Session;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TaskHandler {
 
     private final TaskTable taskTable;
+    private final List<Session> sessions = new ArrayList<>();
 
     public TaskHandler(TaskTable taskTable) {
         this.taskTable = taskTable;
@@ -49,6 +55,31 @@ public class TaskHandler {
         this.taskTable.saveTask(task);
 
         ctx.json(task);
+
+    }
+
+    public void updates(WsConfig wsConfig) {
+        wsConfig.onConnect(wsConnectContext -> {
+            this.sessions.add(wsConnectContext.session);
+        });
+
+        wsConfig.onMessage(wsMessageContext -> {
+
+            wsMessageContext.send(this.taskTable.getAllTask());
+
+        });
+
+    }
+
+    public void sendListeners(Object msg) {
+
+        this.sessions.forEach(session -> {
+            try {
+                session.getRemote().sendString(new Gson().toJson(msg));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
     }
 }

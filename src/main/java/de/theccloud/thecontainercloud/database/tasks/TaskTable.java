@@ -56,7 +56,7 @@ public class TaskTable {
     public TaskImpl getTaskByUid(UUID uid) {
 
         ResultSetFuture resultSetFuture = this.databaseInteractionHandler.getSession()
-                .executeAsync(QueryBuilder.select("*").from("cloud", "tasks")
+                .executeAsync(QueryBuilder.select("uid", "running_services", "max_services", "min_services", "template").from("cloud", "tasks")
                         .where(QueryBuilder.eq("uid", uid)));
 
         Row row = resultSetFuture.getUninterruptibly().one();
