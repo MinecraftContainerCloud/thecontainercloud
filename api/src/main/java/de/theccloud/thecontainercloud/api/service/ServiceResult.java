@@ -8,7 +8,9 @@ public enum ServiceResult {
     STARTING,
     FAILED,
     NO_SPACE,
-    ERROR
+    ERROR,
+    ALREADY_REMOVED,
+    REMOVED
 
 
 }

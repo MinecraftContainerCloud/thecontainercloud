@@ -1,15 +1,17 @@
-package de.theccloud.thecontainercloud.database.tasks;
+package de.theccloud.thecontainercloud.communication.web.tasks;
 
 import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.schemabuilder.SchemaBuilder;
-import de.theccloud.thecontainercloud.database.DatabaseInteractionHandler;
-import de.theccloud.thecontainercloud.impl.task.TaskImpl;
+import de.theccloud.thecontainercloud.communication.DatabaseInteractionHandler;
+import de.theccloud.thecontainercloud.communication.web.tasks.impl.TaskImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TaskTable {
@@ -53,15 +55,20 @@ public class TaskTable {
         return new TaskImpl(maxServices, minServices, runningServices, template, uid);
     }
 
-    public TaskImpl getTaskByUid(UUID uid) {
+    public Optional<TaskImpl> getTaskByUid(UUID uid) {
 
-        ResultSetFuture resultSetFuture = this.databaseInteractionHandler.getSession()
-                .executeAsync(QueryBuilder.select("uid", "running_services", "max_services", "min_services", "template").from("cloud", "tasks")
+
+
+        ResultSet resultSet = this.databaseInteractionHandler.getSession()
+                .execute(QueryBuilder.select("uid", "running_services", "max_services", "min_services", "template").from("cloud", "tasks")
                         .where(QueryBuilder.eq("uid", uid)));
 
-        Row row = resultSetFuture.getUninterruptibly().one();
+        if (resultSet.all().isEmpty())
+            return Optional.empty();
 
-        return this.fromRow(row);
+        Row row = resultSet.one();
+
+        return Optional.of(this.fromRow(row));
     }
 
     public boolean existTask(UUID uid) {

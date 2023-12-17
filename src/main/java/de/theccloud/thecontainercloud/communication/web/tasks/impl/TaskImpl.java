@@ -1,4 +1,4 @@
-package de.theccloud.thecontainercloud.impl.task;
+package de.theccloud.thecontainercloud.communication.web.tasks.impl;
 
 import de.theccloud.thecontainercloud.api.tasks.Task;
 

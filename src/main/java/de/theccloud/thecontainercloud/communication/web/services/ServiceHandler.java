@@ -1,22 +1,29 @@
 package de.theccloud.thecontainercloud.communication.web.services;
 
-import de.theccloud.thecontainercloud.database.service.ServiceTable;
-import de.theccloud.thecontainercloud.impl.service.ServiceImpl;
+import com.google.gson.Gson;
+import de.theccloud.thecontainercloud.communication.web.services.impl.ServiceImpl;
 import io.javalin.http.Context;
+import io.javalin.json.JavalinGson;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class ServiceHandler {
 
+    private final ServiceTable serviceTable;
+
     public ServiceHandler(ServiceTable serviceTable) {
         this.serviceTable = serviceTable;
     }
 
-    private final ServiceTable serviceTable;
-
     public void createService(Context ctx) {
 
+        ServiceCreateBody body = new JavalinGson(new Gson()).fromJsonStream(ctx.bodyInputStream(), ServiceCreateBody.class);
+
+        ServiceImpl service = new ServiceImpl(UUID.randomUUID(), body.taskId(), body.playerCount());
+        this.serviceTable.saveService(service);
+
+        ctx.json(service);
     }
 
     public void getServices(Context ctx) {

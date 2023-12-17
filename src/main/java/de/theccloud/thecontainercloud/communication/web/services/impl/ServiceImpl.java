@@ -1,4 +1,4 @@
-package de.theccloud.thecontainercloud.impl.service;
+package de.theccloud.thecontainercloud.communication.web.services.impl;
 
 import de.theccloud.thecontainercloud.api.service.Service;
 

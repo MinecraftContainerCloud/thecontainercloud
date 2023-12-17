@@ -1,9 +1,9 @@
 package de.theccloud.thecontainercloud;
 
 import de.theccloud.thecontainercloud.communication.web.WebCommunicationManager;
-import de.theccloud.thecontainercloud.database.DatabaseInteractionHandler;
-import de.theccloud.thecontainercloud.database.service.ServiceTable;
-import de.theccloud.thecontainercloud.database.tasks.TaskTable;
+import de.theccloud.thecontainercloud.communication.DatabaseInteractionHandler;
+import de.theccloud.thecontainercloud.communication.web.services.ServiceTable;
+import de.theccloud.thecontainercloud.communication.web.tasks.TaskTable;
 
 public class Main {
 

@@ -1,8 +1,7 @@
 package de.theccloud.thecontainercloud.communication.web.tasks;
 
 import com.google.gson.Gson;
-import de.theccloud.thecontainercloud.database.tasks.TaskTable;
-import de.theccloud.thecontainercloud.impl.task.TaskImpl;
+import de.theccloud.thecontainercloud.communication.web.tasks.impl.TaskImpl;
 import io.javalin.http.Context;
 import io.javalin.json.JavalinGson;
 import io.javalin.websocket.WsConfig;
@@ -11,6 +10,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TaskHandler {
@@ -32,9 +32,14 @@ public class TaskHandler {
 
         UUID id = UUID.fromString(ctx.pathParam("id"));
 
-        TaskImpl taskByUid = this.taskTable.getTaskByUid(id);
+        Optional<TaskImpl> taskByUid = this.taskTable.getTaskByUid(id);
 
-        ctx.json(taskByUid);
+        if (taskByUid.isEmpty()) {
+            ctx.json("empty");
+            return;
+        }
+
+        ctx.json(taskByUid.get());
 
     }
 

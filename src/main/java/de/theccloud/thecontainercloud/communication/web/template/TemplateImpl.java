@@ -1,4 +1,4 @@
-package de.theccloud.thecontainercloud.impl.template;
+package de.theccloud.thecontainercloud.communication.web.template;
 
 import de.theccloud.thecontainercloud.api.template.Template;
 

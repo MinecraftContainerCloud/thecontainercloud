@@ -1,4 +1,4 @@
-package de.theccloud.thecontainercloud.database;
+package de.theccloud.thecontainercloud.communication;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.HostDistance;

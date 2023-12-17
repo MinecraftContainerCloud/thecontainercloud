@@ -2,8 +2,8 @@ package de.theccloud.thecontainercloud.communication.web;
 
 import de.theccloud.thecontainercloud.communication.web.services.ServiceHandler;
 import de.theccloud.thecontainercloud.communication.web.tasks.TaskHandler;
-import de.theccloud.thecontainercloud.database.service.ServiceTable;
-import de.theccloud.thecontainercloud.database.tasks.TaskTable;
+import de.theccloud.thecontainercloud.communication.web.services.ServiceTable;
+import de.theccloud.thecontainercloud.communication.web.tasks.TaskTable;
 import io.javalin.Javalin;
 
 public class WebCommunicationManager {

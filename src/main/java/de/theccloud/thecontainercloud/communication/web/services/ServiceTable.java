@@ -1,12 +1,12 @@
-package de.theccloud.thecontainercloud.database.service;
+package de.theccloud.thecontainercloud.communication.web.services;
 
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.schemabuilder.SchemaBuilder;
-import de.theccloud.thecontainercloud.database.DatabaseInteractionHandler;
-import de.theccloud.thecontainercloud.impl.service.ServiceImpl;
+import de.theccloud.thecontainercloud.communication.DatabaseInteractionHandler;
+import de.theccloud.thecontainercloud.communication.web.services.impl.ServiceImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +72,7 @@ public class ServiceTable {
     }
 
     public void removeService(UUID uid) {
-        this.databaseInteractionHandler.getSession().executeAsync(QueryBuilder.delete().from("cloud", "services")
+        this.databaseInteractionHandler.getSession().execute(QueryBuilder.delete().from("cloud", "services")
                 .where(QueryBuilder.eq("uid", uid)));
     }
 
