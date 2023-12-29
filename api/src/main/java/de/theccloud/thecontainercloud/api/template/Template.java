@@ -12,6 +12,6 @@ public interface Template {
     /**
      * @return path to root folder from template
      */
-    Path getTemplatePath();
+    String getTemplatePath();
 
 }

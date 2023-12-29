@@ -4,11 +4,12 @@ import de.theccloud.thecontainercloud.api.service.ServiceResult;
 import de.theccloud.thecontainercloud.communication.web.services.impl.ServiceImpl;
 import de.theccloud.thecontainercloud.communication.web.tasks.TaskTable;
 import de.theccloud.thecontainercloud.communication.web.tasks.impl.TaskImpl;
-import de.theccloud.thecontainercloud.communication.web.template.TemplateImpl;
 import de.theccloud.thecontainercloud.communication.web.template.TemplateTable;
+import de.theccloud.thecontainercloud.communication.web.template.impl.TemplateImpl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 public class ServiceProcessHandler {
 
-    private final Path rootPath = new File("/data/services/").toPath();
+    private final Path rootPath = new File("C:\\Users\\shorty\\Desktop\\Cloud").toPath();
     private final TaskTable taskTable;
     private final TemplateTable templateTable;
     private final Map<UUID, List<RunningService>> runningService = new HashMap<>();
@@ -47,6 +48,29 @@ public class ServiceProcessHandler {
         return ServiceResult.REMOVED;
     }
 
+    public String getConsoleOutput(UUID uid) throws IOException {
+
+        Optional<ServiceImpl> serviceImplFromUid = this.getServiceImplFromUid(uid);
+        if (serviceImplFromUid.isEmpty())
+            return null;
+
+        Optional<RunningService> optionalRunningService = this.runningService.get(serviceImplFromUid.get().getTask()).stream()
+                .filter(runningService1 -> runningService1.service().getUid() == uid).findFirst();
+
+        if (optionalRunningService.isEmpty())
+            return null;
+
+        RunningService runningService = optionalRunningService.get();
+
+        InputStream inputStream = runningService.process().getInputStream();
+
+
+        byte b[] = new byte[inputStream.available()];
+        inputStream.read(b, 0, b.length);
+
+        return new String(b);
+    }
+
     private boolean containsService(UUID uid) {
         return this.getServiceImplFromUid(uid).isPresent();
     }
@@ -57,43 +81,43 @@ public class ServiceProcessHandler {
      * @param service service that should be started
      * @return ServiceResult that represents the case of the creation of the service
      */
-    public ServiceResult createService(ServiceImpl service) {
+    public ServiceResult createService(ServiceImpl service) throws IOException {
 
-        ProcessBuilder processBuilder = new ProcessBuilder("java -jar -DcloudServiceId=" + service.getUid().toString() + " server.jar");
 
         File file = new File(rootPath.toFile(), service.getUid().toString());
 
-        Optional<TaskImpl> optionalTask = this.taskTable.getTaskByUid(service.getUid());
+        Optional<TaskImpl> optionalTask = this.taskTable.getTaskByUid(service.getTask());
 
-        if (optionalTask.isEmpty())
+        if (optionalTask.isEmpty()) {
+            System.out.println("Task not found");
             return ServiceResult.ERROR;
+        }
 
         TaskImpl task = optionalTask.get();
 
         Optional<TemplateImpl> optionalTemplate = this.templateTable.getTemplateByUid(task.getTemplate());
 
-        if (optionalTemplate.isEmpty())
+        if (optionalTemplate.isEmpty()) {
+            System.out.println("Template not found");
             return ServiceResult.FAILED;
+        }
 
         TemplateImpl template = optionalTemplate.get();
 
-        processBuilder.directory(file);
+        //this.prepareDirectory(Path.of(template.getTemplatePath()), file.toPath());
 
-        this.prepareDirectory(template.getTemplatePath(), file.toPath());
+        Process exec = Runtime.getRuntime().exec("java -DcloudServiceId=" + service.getUid().toString() + " -jar " + file.toPath().toString() + "/server.jar");
 
-        try {
-            Process start = processBuilder.start();
+        //ProcessBuilder processBuilder = new ProcessBuilder("java -DcloudServiceId=" + service.getUid().toString() + " -jar server.jar");
+        //processBuilder.directory(file);
 
-            this.addRunningService(start, task, service);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.addRunningService(exec, task, service);
 
         return ServiceResult.STARTING;
     }
 
-    private Optional<ServiceImpl> getServiceImplFromUid(UUID uid) {
+    protected Optional<ServiceImpl> getServiceImplFromUid(UUID uid) {
         Set<Map.Entry<UUID, List<RunningService>>> entries = this.runningService.entrySet();
 
         Optional<Stream<ServiceImpl>> first = entries.stream()
@@ -145,6 +169,8 @@ public class ServiceProcessHandler {
 
         if (!destinationFolder.toFile().exists())
             destinationFolder.toFile().mkdirs();
+
+        // TODO - won't work correctly
 
         try {
             Files.copy(templateFolder, destinationFolder, StandardCopyOption.REPLACE_EXISTING);

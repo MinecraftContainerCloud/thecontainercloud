@@ -7,6 +7,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.datastax.driver.core.schemabuilder.SchemaBuilder;
 import de.theccloud.thecontainercloud.communication.DatabaseInteractionHandler;
+import de.theccloud.thecontainercloud.communication.web.template.impl.TemplateImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +35,11 @@ public class TemplateTable {
 
         List<TemplateImpl> list = new ArrayList<>();
 
-        for (Row row : resultSetFuture.getUninterruptibly().all())
+        for (Row row : resultSetFuture.getUninterruptibly().all()) {
+            if (row == null)
+                continue;
             list.add(this.fromRow(row));
+        }
 
 
         return list;
@@ -55,10 +59,10 @@ public class TemplateTable {
                 .execute(QueryBuilder.select("uid", "name", "path").from("cloud", "templates")
                         .where(QueryBuilder.eq("uid", uid)));
 
-        if (resultSet.all().isEmpty())
-            return Optional.empty();
-
         Row row = resultSet.one();
+
+        if (row == null)
+            return Optional.empty();
 
         return Optional.of(this.fromRow(row));
     }
@@ -93,7 +97,7 @@ public class TemplateTable {
                                 ),
                                 List.of(
                                         template.getUid(),
-                                        template.getTemplatePath().toString(),
+                                        template.getTemplatePath(),
                                         template.getTemplateName()
                                 ))
         );

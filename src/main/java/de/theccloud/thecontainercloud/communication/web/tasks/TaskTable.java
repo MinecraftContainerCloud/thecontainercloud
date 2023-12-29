@@ -57,16 +57,14 @@ public class TaskTable {
 
     public Optional<TaskImpl> getTaskByUid(UUID uid) {
 
-
-
         ResultSet resultSet = this.databaseInteractionHandler.getSession()
                 .execute(QueryBuilder.select("uid", "running_services", "max_services", "min_services", "template").from("cloud", "tasks")
                         .where(QueryBuilder.eq("uid", uid)));
 
-        if (resultSet.all().isEmpty())
-            return Optional.empty();
-
         Row row = resultSet.one();
+
+        if (row == null)
+            return Optional.empty();
 
         return Optional.of(this.fromRow(row));
     }

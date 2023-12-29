@@ -1,4 +1,4 @@
-package de.theccloud.thecontainercloud.communication.web.template;
+package de.theccloud.thecontainercloud.communication.web.template.impl;
 
 import de.theccloud.thecontainercloud.api.template.Template;
 
@@ -29,12 +29,9 @@ public class TemplateImpl implements Template {
         return name;
     }
 
+
     @Override
-    public Path getTemplatePath() {
-        try {
-            return Path.of(new URI(path));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+    public String getTemplatePath() {
+        return path;
     }
 }
